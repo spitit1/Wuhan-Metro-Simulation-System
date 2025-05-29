@@ -257,4 +257,18 @@ class SubwaySystem {
         }
         return null;
     }
+    // 6. 计算普通票价
+    public double calculateFare(double distance) {
+        if (distance <= 9) return 2;
+        if (distance <= 14) return 3;
+        if (distance <= 21) return 4;
+        if (distance <= 30) return 5;
+        if (distance <= 41) return 6;
+        return 6 + Math.ceil((distance - 41) / 20);
+    }
+
+    // 7. 计算武汉通票价
+    public double calculateWHTFare(double distance) {
+        return Math.round(calculateFare(distance) * 0.9 * 10) / 10.0;
+    }
 }
