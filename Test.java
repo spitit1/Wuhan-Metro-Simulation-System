@@ -16,5 +16,18 @@ public class Test {
         transfers.forEach((station, lines) -> 
             System.out.println(station + ": " + lines)
         );
+        // 2. 测试距离查询
+        System.out.println("\n===== 距离查询 =====");
+        try {
+            String queryStation = "华中科技大学";
+            double maxDistance = 1.0;
+            Map<String, Map.Entry<Set<String>, Double>> nearby = subway.getStationsWithinDistance(queryStation, maxDistance);
+            nearby.forEach((station, info) -> 
+                System.out.printf("%s: 线路=%s, 距离=%.1f公里\n", station, info.getKey(), info.getValue())
+            );
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
+
     }
 }

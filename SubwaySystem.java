@@ -116,4 +116,42 @@ class SubwaySystem {
         });
         return result;
     }
+    // 2. 获取距离小于n的所有站点
+    public Map<String, Map.Entry<Set<String>, Double>> getStationsWithinDistance(String start, double n) {
+        if (!stations.containsKey(start)) 
+            throw new IllegalArgumentException("站点不存在: " + start);
+        
+        Map<String, Double> minDist = new HashMap<>();
+        minDist.put(start, 0.0);
+        
+        PriorityQueue<Map.Entry<String, Double>> queue = new PriorityQueue<>(Map.Entry.comparingByValue());
+        queue.add(new AbstractMap.SimpleEntry<>(start, 0.0));
+        
+        Map<String, Map.Entry<Set<String>, Double>> result = new HashMap<>();
+        
+        while (!queue.isEmpty()) {
+            Map.Entry<String, Double> entry = queue.poll();
+            String current = entry.getKey();
+            double currentDist = entry.getValue();
+            
+            if (currentDist > n) continue;
+            if (!current.equals(start)) { // 排除起点自身
+                result.put(current, new AbstractMap.SimpleEntry<>(
+                    stations.get(current).getLines(), 
+                    currentDist
+                ));
+            }
+            
+            for (Edge edge : graph.getOrDefault(current, Collections.emptyList())) {
+                String neighbor = edge.getTarget();
+                double newDist = currentDist + edge.getDistance();
+                
+                if (newDist <= n && newDist < minDist.getOrDefault(neighbor, Double.MAX_VALUE)) {
+                    minDist.put(neighbor, newDist);
+                    queue.add(new AbstractMap.SimpleEntry<>(neighbor, newDist));
+                }
+            }
+        }
+        return result;
+    }
 }
