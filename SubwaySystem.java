@@ -154,4 +154,30 @@ class SubwaySystem {
         }
         return result;
     }
+    // 3. 查找所有路径（无重复站点）
+    public Set<List<String>> findAllPaths(String start, String end) {
+        if (!stations.containsKey(start) || !stations.containsKey(end))
+            throw new IllegalArgumentException("站点不存在");
+        
+        Set<List<String>> paths = new HashSet<>();
+        dfs(start, end, new LinkedHashSet<>(), paths);
+        return paths;
+    }
+
+    private void dfs(String current, String end, Set<String> visited, Set<List<String>> paths) {
+        visited.add(current);
+        
+        if (current.equals(end)) {
+            paths.add(new ArrayList<>(visited));
+        } else {
+            for (Edge edge : graph.getOrDefault(current, Collections.emptyList())) {
+                String neighbor = edge.getTarget();
+                if (!visited.contains(neighbor)) {
+                    dfs(neighbor, end, visited, paths);
+                }
+            }
+        }
+        
+        visited.remove(current);
+    }
 }

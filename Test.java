@@ -28,6 +28,17 @@ public class Test {
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
         }
+        // 3. 测试所有路径查询
+        System.out.println("\n===== 所有路径查询 =====");
+        try {
+            String start = "华中科技大学";
+            String end = "洪山广场";
+            Set<List<String>> paths = subway.findAllPaths(start, end);
+            System.out.println("路径数量: " + paths.size());
+            paths.forEach(path -> System.out.println(path));
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
 
     }
 }
