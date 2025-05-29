@@ -180,4 +180,81 @@ class SubwaySystem {
         
         visited.remove(current);
     }
+    // 4. 查找最短路径（Dijkstra算法）
+    public PathResult findShortestPath(String start, String end) {
+        if (!stations.containsKey(start) || !stations.containsKey(end))
+            throw new IllegalArgumentException("站点不存在");
+        
+        Map<String, Double> dist = new HashMap<>();
+        Map<String, String> prev = new HashMap<>();
+        PriorityQueue<Map.Entry<String, Double>> queue = new PriorityQueue<>(Map.Entry.comparingByValue());
+        
+        // 初始化
+        stations.keySet().forEach(station -> dist.put(station, Double.MAX_VALUE));
+        dist.put(start, 0.0);
+        queue.add(new AbstractMap.SimpleEntry<>(start, 0.0));
+        
+        while (!queue.isEmpty()) {
+            Map.Entry<String, Double> entry = queue.poll();
+            String current = entry.getKey();
+            
+            if (current.equals(end)) break;
+            if (entry.getValue() > dist.get(current)) continue;
+            
+            for (Edge edge : graph.getOrDefault(current, Collections.emptyList())) {
+                String neighbor = edge.getTarget();
+                double newDist = dist.get(current) + edge.getDistance();
+                
+                if (newDist < dist.get(neighbor)) {
+                    dist.put(neighbor, newDist);
+                    prev.put(neighbor, current);
+                    queue.add(new AbstractMap.SimpleEntry<>(neighbor, newDist));
+                }
+            }
+        }
+        
+        // 回溯路径
+        List<String> path = new LinkedList<>();
+        for (String at = end; at != null; at = prev.get(at)) {
+            path.add(0, at);
+        }
+        
+        return new PathResult(path, dist.get(end));
+    }
+    // 5. 打印路径（简洁格式）
+    public void printPath(List<String> path) {
+        if (path.size() < 2) {
+            System.out.println("无效路径");
+            return;
+        }
+        
+        String currentLine = getLineBetween(path.get(0), path.get(1));
+        String segmentStart = path.get(0);
+        StringBuilder output = new StringBuilder();
+        
+        for (int i = 1; i < path.size(); i++) {
+            String line = (i < path.size() - 1) ? getLineBetween(path.get(i), path.get(i + 1)) : null;
+            
+            if (i == path.size() - 1 || !currentLine.equals(line)) {
+                output.append("乘坐").append(currentLine).append("从").append(segmentStart).append("到").append(path.get(i));
+                if (i < path.size() - 1) {
+                    output.append("，换乘");
+                    currentLine = line;
+                    segmentStart = path.get(i);
+                }
+            }
+        }
+        
+        System.out.println(output);
+    }
+
+    // 获取两站点间的线路
+    private String getLineBetween(String a, String b) {
+        for (Edge edge : graph.get(a)) {
+            if (edge.getTarget().equals(b)) {
+                return edge.getLine();
+            }
+        }
+        return null;
+    }
 }
